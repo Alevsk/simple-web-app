@@ -111,10 +111,6 @@ func newTotal(total, newElement int) int {
 	return total + newElement
 }
 
-func newTotal(total, newElement int) int {
-	return total + newElement
-}
-
 func productTotalPrice(productPrice, quantity int) int {
 	return productPrice * quantity
 }
