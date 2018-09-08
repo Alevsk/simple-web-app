@@ -7,9 +7,17 @@ function fetch() {
 
 }
 
+function guidGenerator() {
+  var S4 = function() {
+     return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+  };
+  return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+}
+
 function add(name, price, quantity) {
   axios.post('/add', {
-    id: queryName,
+    id: guidGenerator(),
+    // id: queryName,
     name: name,
     quantity: parseInt(price),
     price: parseInt(quantity)
@@ -53,7 +61,7 @@ function edit(name, price, quantity) {
 
 function deleteItem() {
   axios.post('/delete', {
-    id: queryName
+    id: queryName,
   })
     .then(function (response) {
       data = response.data
@@ -73,8 +81,8 @@ function state(elementList) {
   var bodyTable = document.getElementById("tableBody");
   var items = elementList.item
   for (var key in items) {
-    var pEdit = paragraphEdit(items[key].name,items[key].price,items[key].quantity)
-    var pDelete = paragraphDelete(items[key].name)
+    var pEdit = paragraphEdit(items[key].name,items[key].price,items[key].quantity, items[key].id)
+    var pDelete = paragraphDelete(items[key].name, items[key].id)
     var tableRow = document.createElement("tr");
     var dataNameTable = document.createElement("td");
     var dataPriceTable = document.createElement("td");
@@ -86,9 +94,9 @@ function state(elementList) {
     var priceValue = document.createTextNode(items[key].price);
     var quantityValue = document.createTextNode(items[key].quantity);
     dataNameTable.appendChild(nameValue);
-    dataNameTable.setAttribute("id", items[key].name+"-name");
-    dataPriceTable.setAttribute("id", items[key].price+"-price");
-    dataQuantityTable.setAttribute("id", items[key].quantity+"-quantity");
+    dataNameTable.setAttribute("id", items[key].id+"-name");
+    dataPriceTable.setAttribute("id", items[key].id+"-price");
+    dataQuantityTable.setAttribute("id", items[key].id+"-quantity");
     dataPriceTable.appendChild(priceValue);
     dataQuantityTable.appendChild(quantityValue);
     dataEditTable.appendChild(pEdit)
@@ -109,7 +117,7 @@ function state(elementList) {
   document.getElementById("total").textContent = "Total: " + elementList.total;
 }
 
-function paragraphEdit(name,price,quantity) {
+function paragraphEdit(name,price,quantity,id) {
   var pEdit = document.createElement("p");
   pEdit.title = "Edit"
   var dataPlacement = document.createAttribute("data-placement");
@@ -125,7 +133,7 @@ function paragraphEdit(name,price,quantity) {
   var dataTitle = document.createAttribute("data-title");
   dataTitle.value = "Edit";
   buttonEdit.setAttributeNode(dataTitle);
-  var idEdit = name+"-"+price+"-"+quantity
+  var idEdit = id
   buttonEdit.setAttribute("id", idEdit);
   var onclickbtn = document.createAttribute("onclick");
   onclickbtn.value = "setQuery(this.id); setValueModal(this.id);";
@@ -144,7 +152,7 @@ function paragraphEdit(name,price,quantity) {
   return pEdit
 }
 
-function paragraphDelete(name) {
+function paragraphDelete(name, id) {
   var pDelete = document.createElement("p");
   pDelete.title = "Delete"
   var dataPlacement = document.createAttribute("data-placement");
@@ -160,7 +168,7 @@ function paragraphDelete(name) {
   var dataTitle = document.createAttribute("data-title");
   dataTitle.value = "Delete";
   buttonDelete.setAttributeNode(dataTitle);
-  buttonDelete.setAttribute("id", name);
+  buttonDelete.setAttribute("id", id);
   var onclickbtn = document.createAttribute("onclick");
   onclickbtn.value = "setQuery(this.id)";
   buttonDelete.setAttributeNode(onclickbtn);
@@ -210,8 +218,7 @@ function paragraphAdd() {
 }
 
 function setQuery(id) {
- var name =  id.split("-"); 
-  queryName = name[0]
+  queryName = id
 }
 
 function setValueModal(id){
@@ -219,9 +226,9 @@ function setValueModal(id){
   var name = all[0]
   var price = all[1]
   var quantity = all[2]
-  var nameRef = name+"-name"
-  var quantRef = quantity+"-quantity"
-  var priceRef = price+"-price"
+  var nameRef = id+"-name"
+  var quantRef = id+"-quantity"
+  var priceRef = id+"-price"
   var nameItem = document.getElementById(nameRef).textContent; 
   var quantityItem = document.getElementById(quantRef).textContent; 
   var priceItem = document.getElementById(priceRef).textContent; 
